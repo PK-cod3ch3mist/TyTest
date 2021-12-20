@@ -79,6 +79,8 @@ int main() {
     noecho();
     keypad(stdscr, TRUE);
     init_pair(1, COLOR_BLUE, COLOR_BLACK);
+    init_pair(2, COLOR_WHITE, COLOR_BLACK);
+    init_pair(3, COLOR_WHITE, COLOR_RED);
 
     /* Create items */
     n_choices = ARRAY_SIZE(choices);
@@ -101,13 +103,13 @@ int main() {
     set_menu_mark(my_menu, " > ");
 
     /* Print a border around the main window and print a title */
-    box(my_menu_win, 0, 0);
+    wborder(my_menu_win, '|', '|', '-', '-', '+', '+', '+', '+');
     wattron(my_menu_win, A_BOLD);
     print_in_middle(my_menu_win, 1, 0, 60, "TyTest", COLOR_PAIR(1));
     wattroff(my_menu_win, A_BOLD);
-    mvwaddch(my_menu_win, 2, 0, ACS_LTEE);
-    mvwhline(my_menu_win, 2, 1, ACS_HLINE, 58);
-    mvwaddch(my_menu_win, 2, 59, ACS_RTEE);
+    mvwaddch(my_menu_win, 2, 0, '+');
+    mvwhline(my_menu_win, 2, 1, '-', 58);
+    mvwaddch(my_menu_win, 2, 59, '+');
     mvprintw(LINES - 2, 0, "F1 to exit");
     refresh();
 
@@ -146,16 +148,35 @@ int main() {
         int starty = (LINES - 20) / 2;
         int startx = (COLS - 100) / 2;
         wbw_win = newwin(20, 100, starty, startx);
-        box(wbw_win, 0, 0);
+        wborder(wbw_win, '|', '|', '-', '-', '+', '+', '+', '+');
         wattron(wbw_win, A_BOLD);
         print_in_middle(wbw_win, 1, 0, 100, "Word by Word Test", COLOR_PAIR(1));
         wattroff(wbw_win, A_BOLD);
-        mvwaddch(wbw_win, 2, 0, ACS_LTEE);
-        mvwhline(wbw_win, 2, 1, ACS_HLINE, 98);
-        mvwaddch(wbw_win, 2, 99, ACS_RTEE);
+        mvwaddch(wbw_win, 2, 0, '+');
+        mvwhline(wbw_win, 2, 1, '-', 98);
+        mvwaddch(wbw_win, 2, 99, '+');
+        print_in_middle(wbw_win, 3, 0, 100, "In this test, you will be required to type word by word.", COLOR_PAIR(2));
+        print_in_middle(wbw_win, 4, 0, 100, "Each word has to typed correctly, until which you can't proceed.", COLOR_PAIR(2));
+        print_in_middle(wbw_win, 5, 0, 100, "You will not be able to see the whole text though, only the current word highlighted.", COLOR_PAIR(2));
+        print_in_middle(wbw_win, 6, 0, 100, "The test will start as soon you press the key.", COLOR_PAIR(2));
+        mvwaddch(wbw_win, 16, 30, '+');
+        mvwhline(wbw_win, 16, 31, '-', 40);
+        mvwaddch(wbw_win, 16, 70, '+');
+        mvwaddch(wbw_win, 17, 30, '|');
+        mvwaddch(wbw_win, 17, 70, '|');
+        wattron(wbw_win, A_BLINK);
+        print_in_middle(wbw_win, 17, 0, 100, "Press Enter to start", COLOR_PAIR(3));
+        wattroff(wbw_win, A_BLINK);
+        mvwaddch(wbw_win, 18, 30, '+');
+        mvwhline(wbw_win, 18, 31, '-', 40);
+        mvwaddch(wbw_win, 18, 70, '+');
         mvprintw(LINES - 2, 0, "F1 to exit");
         wrefresh(wbw_win);
         while((c = wgetch(my_menu_win)) != KEY_F(1));
+        /**
+         * Show text and conduct typing test word by word. Do this by creating an overlay
+         * upon the text and not moving forward until next word is given
+         */
     }
     endwin();
 }
