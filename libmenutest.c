@@ -67,6 +67,7 @@ void test_func() {
         }
     } while((c = wgetch(wbw_win)));
 
+    wclear(wbw_win);
     renew_win(wbw_win, 20, 100, "No Error Allowed Test", COLOR_PAIR(1));
     mvwhline(wbw_win, 17, 2, '_', 97);
     wrefresh(wbw_win);
@@ -112,6 +113,7 @@ void test_func() {
     }
     noecho();
 
+    wclear(wbw_win);
     renew_win(wbw_win, 20, 100, "No Error Allowed Test", COLOR_PAIR(1));
     mvwhline(wbw_win, 17, 2, '_', 97);
     wrefresh(wbw_win);
@@ -156,13 +158,7 @@ int main_menu() {
     set_menu_mark(my_menu, " > ");
 
     /* Print a border around the main window and print a title */
-    wborder(my_menu_win, '|', '|', '-', '-', '+', '+', '+', '+');
-    wattron(my_menu_win, A_BOLD);
-    print_in_middle(my_menu_win, 1, 0, 60, "TyTest", COLOR_PAIR(1));
-    wattroff(my_menu_win, A_BOLD);
-    mvwaddch(my_menu_win, 2, 0, '+');
-    mvwhline(my_menu_win, 2, 1, '-', 58);
-    mvwaddch(my_menu_win, 2, 59, '+');
+    renew_win(my_menu_win, 10, 60, "TyTest", COLOR_PAIR(1));
     refresh();
 
     /* Post the menu */

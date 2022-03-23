@@ -6,6 +6,13 @@
 #include <string.h>
 #include <stdlib.h>
 
+void print_in_middle_para(WINDOW*, int, int, int, char*, chtype);
+void print_in_middle(WINDOW*, int, int, int, char*, chtype);
+void renew_win(WINDOW*, int, int, char*, chtype);
+WINDOW* create_window(int, int, int, int, char*, chtype);
+void destroy_win(WINDOW*);
+
+
 void print_in_middle_para(WINDOW* win, int sy, int sx, int width, char* msg, chtype color) {
     int len, x, y;
     float temp;
@@ -67,30 +74,22 @@ void print_in_middle(WINDOW* win, int starty, int startx, int width, char* msg, 
     refresh();
 }
 
+void renew_win(WINDOW* win, int rows, int cols, char *title, chtype color) {
+    wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
+    wattron(win, A_BOLD);
+    print_in_middle(win, 1, 0, cols, title, color);
+    wattroff(win, A_BOLD);
+    mvwaddch(win, 2, 0, '+');
+    mvwhline(win, 2, 1, '-', cols - 2);
+    mvwaddch(win, 2, cols - 1, '+');
+    wrefresh(win);
+}
+
 WINDOW* create_window(int startx, int starty, int rows, int cols, char *title, chtype color) {
     WINDOW *win;
     win = newwin(rows, cols, starty, startx);
-    wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
-    wattron(win, A_BOLD);
-    print_in_middle(win, 1, 0, cols, title, color);
-    wattroff(win, A_BOLD);
-    mvwaddch(win, 2, 0, '+');
-    mvwhline(win, 2, 1, '-', cols - 2);
-    mvwaddch(win, 2, cols - 1, '+');
-    wrefresh(win);
+    renew_win(win, rows, cols, title, color);
     return win;
-}
-
-void renew_win(WINDOW* win, int rows, int cols, char *title, chtype color) {
-    wclear(win);
-    wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
-    wattron(win, A_BOLD);
-    print_in_middle(win, 1, 0, cols, title, color);
-    wattroff(win, A_BOLD);
-    mvwaddch(win, 2, 0, '+');
-    mvwhline(win, 2, 1, '-', cols - 2);
-    mvwaddch(win, 2, cols - 1, '+');
-    wrefresh(win);
 }
 
 void destroy_win(WINDOW *local_win) {
