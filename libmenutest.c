@@ -77,7 +77,7 @@ void test_func() {
     mvwhline(wbw_win, 17, 2, ACS_S1, WIN_SIZE_COLS - 3);
     wrefresh(wbw_win);
 
-    FILE *wbwfile = fopen("wbw-short.txt", "r");
+    FILE *wbwfile = fopen("./assets/wbw-short.txt", "r");
     int count = 0, check, loopExit = 0;
     long double tm = 0;
     time_t tic = (time_t)0;
