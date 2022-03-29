@@ -2,6 +2,8 @@
 #include <time.h>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+#define WIN_SIZE_ROWS 20
+#define WIN_SIZE_COLS 70
 
 char *choices[] = {
     "Word by word test",
@@ -12,14 +14,13 @@ char *choices[] = {
 
 char *desc = "";
 
-void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color);
-void destroy_win(WINDOW *local_win);
 void test_func();
 int main_menu();
 void about_func();
 
 int main() {
     /* Initialize curses */
+    setlocale(LC_ALL, "");
     initscr();
     start_color();
     cbreak();
@@ -44,20 +45,24 @@ int main() {
     endwin();
 }
 
+/**
+ * @brief Function to implement the no error allowed typing test on a separate window
+ */
 void test_func() {
     int c;
     WINDOW *wbw_win;
-    int starty = (LINES - 20) / 2;
-    int startx = (COLS - 100) / 2;
-    wbw_win = create_window(startx, starty, 20, 100, "No Error Allowed Test", COLOR_PAIR(1));
+    int starty = (LINES - WIN_SIZE_ROWS) / 2;
+    int startx = (COLS - WIN_SIZE_COLS) / 2;
+    wbw_win = create_window(startx, starty, WIN_SIZE_ROWS, WIN_SIZE_COLS, "No Error Allowed Test", COLOR_PAIR(1));
 
     c = 0;
 
     do {
-        print_in_middle_para(wbw_win, 5, 15, 70, "In this test, you will be required to type word by word. In the end you will be given an error score as well. You will not be able to see the whole text though, only the current word highlighted. The test will start as soon you press the key.", COLOR_PAIR(2));
+        int startX = 3;
+        print_in_middle_para(wbw_win, 5, startX, WIN_SIZE_COLS - (startX * 2), "In this test, you will be required to type word by word (enter to go to next word). In the end you will be given an error score as well. You will not be able to see the whole text though, only the current word highlighted. The test will start as soon you press the key.", COLOR_PAIR(2));
         wattron(wbw_win, A_BOLD);
-        print_in_middle(wbw_win, 16, 0, 100, "Press Enter to start", COLOR_PAIR(4));
-        print_in_middle(wbw_win, 17, 0, 100, "Enter character 'x' to exit", COLOR_PAIR(3));
+        print_in_middle(wbw_win, 16, 0, WIN_SIZE_COLS, "Press Enter to start", COLOR_PAIR(4));
+        print_in_middle(wbw_win, 17, 0, WIN_SIZE_COLS, "Enter character 'x' to exit", COLOR_PAIR(3));
         wattroff(wbw_win, A_BOLD);
         wrefresh(wbw_win);
         if (c == 10) break; /* Enter key is pressed */
@@ -68,8 +73,8 @@ void test_func() {
     } while((c = wgetch(wbw_win)));
 
     wclear(wbw_win);
-    renew_win(wbw_win, 20, 100, "No Error Allowed Test", COLOR_PAIR(1));
-    mvwhline(wbw_win, 17, 2, '_', 97);
+    renew_win(wbw_win, WIN_SIZE_ROWS, WIN_SIZE_COLS, "No Error Allowed Test", COLOR_PAIR(1));
+    mvwhline(wbw_win, 17, 2, ACS_S1, WIN_SIZE_COLS - 3);
     wrefresh(wbw_win);
 
     FILE *wbwfile = fopen("wbw-short.txt", "r");
@@ -78,20 +83,20 @@ void test_func() {
     time_t tic = (time_t)0;
 
     if (wbwfile == NULL) {
-        print_in_middle(wbw_win, 3, 0, 100, "FILE FAILED TO OPEN", COLOR_PAIR(3));
+        print_in_middle(wbw_win, 3, 0, WIN_SIZE_COLS, "FILE FAILED TO OPEN", COLOR_PAIR(3));
     }
     else {
         echo();
-        char word[100];
-        char user_input[100] = "\0";
-        char message[100] = "\0";
+        char word[WIN_SIZE_COLS];
+        char user_input[WIN_SIZE_COLS] = "\0";
+        char message[WIN_SIZE_COLS] = "\0";
         int index;
 
         while (fscanf(wbwfile, "%99s", word) == 1) {
-            print_in_middle(wbw_win, 4, 0, 100, word, COLOR_PAIR(2));
+            print_in_middle(wbw_win, 4, 0, WIN_SIZE_COLS, word, COLOR_PAIR(2));
             sprintf(message, "Time taken in previous word : %.2lf", (double)tic);
-            print_in_middle(wbw_win, 8, 0, 100, message, COLOR_PAIR(4));
-            print_in_middle(wbw_win, 9, 0, 100, "Type quit() at any time to quit", COLOR_PAIR(3));
+            print_in_middle(wbw_win, 8, 0, WIN_SIZE_COLS, message, COLOR_PAIR(4));
+            print_in_middle(wbw_win, 9, 0, WIN_SIZE_COLS, "Type quit() at any time to quit", COLOR_PAIR(3));
             wrefresh(wbw_win);
             tic = time(NULL);
             do {
@@ -104,7 +109,7 @@ void test_func() {
             } while (!check && !loopExit);
             if (loopExit) break;
             tic = time(NULL) - tic;
-            print_in_middle(wbw_win, 4, 0, 100, "                         ", COLOR_PAIR(2));
+            print_in_middle(wbw_win, 4, 0, WIN_SIZE_COLS, "                         ", COLOR_PAIR(2));
             strcpy(word, "\0");
             strcpy(user_input, "\0");
             count += index;
@@ -114,18 +119,21 @@ void test_func() {
     noecho();
 
     wclear(wbw_win);
-    renew_win(wbw_win, 20, 100, "No Error Allowed Test", COLOR_PAIR(1));
-    mvwhline(wbw_win, 17, 2, '_', 97);
+    renew_win(wbw_win, WIN_SIZE_ROWS, WIN_SIZE_COLS, "No Error Allowed Test", COLOR_PAIR(1));
     wrefresh(wbw_win);
 
     mvwprintw(wbw_win, 6, 2, "Time Taken : %Lf seconds", tm);
     mvwprintw(wbw_win, 7, 2, "Speed : %Lf characters per second", (long double)count / tm);
-    print_in_middle(wbw_win, 16, 0, 100, "Press any key to exit", COLOR_PAIR(3));
+    print_in_middle(wbw_win, 16, 0, WIN_SIZE_COLS, "Press any key to exit", COLOR_PAIR(3));
     c = wgetch(wbw_win);
 
     destroy_win(wbw_win);
 }
 
+/**
+ * @brief Creates a menu list of items using the choices array and waits for user choice
+ * @return An integer representing the user choice/menu item
+ */
 int main_menu() {
     ITEM **my_items;
     int c;
@@ -195,15 +203,18 @@ int main_menu() {
     return curr_choice;
 }
 
+/**
+ * @brief Displays 'about software' information on a separate window
+ */
 void about_func() {
     int c;
     WINDOW *about_win;
-    int starty = (LINES - 20) / 2;
-    int startx = (COLS - 100) / 2;
-    about_win = create_window(startx, starty, 20, 100, "About TyTest", COLOR_PAIR(1));
+    int starty = (LINES - WIN_SIZE_ROWS) / 2;
+    int startx = (COLS - WIN_SIZE_COLS) / 2;
+    about_win = create_window(startx, starty, WIN_SIZE_ROWS, WIN_SIZE_COLS, "About TyTest", COLOR_PAIR(1));
 
-    print_in_middle_para(about_win, 4, 0, 100, "TyTest (v0.1.0) is a terminal based typing test application. It is made as a hobbyist project to demonstrate use of ncurses library in C. It currently supports only a word by word test. I plan to add different types of tests to it in the future, stay tuned!", COLOR_PAIR(2));
-    print_in_middle(about_win, 17, 0, 100, "Press any key to exit", COLOR_PAIR(3));
+    print_in_middle_para(about_win, 4, 0, WIN_SIZE_COLS, "TyTest (v0.1.0) is a terminal based typing test application. It is made as a hobbyist project to demonstrate use of ncurses library in C. It currently supports only a word by word test. I plan to add different types of tests to it in the future, stay tuned!", COLOR_PAIR(2));
+    print_in_middle(about_win, 17, 0, WIN_SIZE_COLS, "Press any key to exit", COLOR_PAIR(3));
 
     c = wgetch(about_win);
     destroy_win(about_win);

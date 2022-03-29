@@ -5,6 +5,7 @@
 #include <menu.h>
 #include <string.h>
 #include <stdlib.h>
+#include <locale.h>
 
 void print_in_middle_para(WINDOW*, int, int, int, char*, chtype);
 void print_in_middle(WINDOW*, int, int, int, char*, chtype);
@@ -12,7 +13,15 @@ void renew_win(WINDOW*, int, int, char*, chtype);
 WINDOW* create_window(int, int, int, int, char*, chtype);
 void destroy_win(WINDOW*);
 
-
+/**
+ * @brief Function to print a paragraph in the middle of a window, breaking lines/word wrapping automatically
+ * @param win pointer to ncurses window
+ * @param sy starting y coordinate
+ * @param sx starting x coordinate
+ * @param width required maximum width of a line
+ * @param msg message string (paragraph to be printed)
+ * @param color color setting for printing
+ */
 void print_in_middle_para(WINDOW* win, int sy, int sx, int width, char* msg, chtype color) {
     int len, x, y;
     float temp;
@@ -51,6 +60,15 @@ void print_in_middle_para(WINDOW* win, int sy, int sx, int width, char* msg, cht
     wrefresh(win);
 }
 
+/**
+ * @brief Function to print a line in the middle of a window
+ * @param win pointer to ncurses window
+ * @param starty starting y coordinate
+ * @param startx starting x coordinate
+ * @param width required maximum width of a line
+ * @param msg message string (line to be printed)
+ * @param color color setting for printing
+ */
 void print_in_middle(WINDOW* win, int starty, int startx, int width, char* msg, chtype color) {
     int length, x, y;
     float temp;
@@ -74,17 +92,35 @@ void print_in_middle(WINDOW* win, int starty, int startx, int width, char* msg, 
     refresh();
 }
 
-void renew_win(WINDOW* win, int rows, int cols, char *title, chtype color) {
-    wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
+/**
+ * @brief Function to redraw border and reprint title of a window after it has been cleared
+ * @param win ncurses window pointer
+ * @param rows window height
+ * @param cols window length
+ * @param title heading to be displayed at the top of window
+ * @param color color setting for title
+ */
+void renew_win(WINDOW* win, int rows, int cols, char *title, chtype color) { 
+    box(win, ACS_VLINE, ACS_HLINE);
     wattron(win, A_BOLD);
     print_in_middle(win, 1, 0, cols, title, color);
     wattroff(win, A_BOLD);
-    mvwaddch(win, 2, 0, '+');
-    mvwhline(win, 2, 1, '-', cols - 2);
-    mvwaddch(win, 2, cols - 1, '+');
+    mvwaddch(win, 2, 0, ACS_LTEE);
+    mvwhline(win, 2, 1, ACS_HLINE, cols - 2);
+    mvwaddch(win, 2, cols - 1, ACS_RTEE);
     wrefresh(win);
 }
 
+/**
+ * @brief Function to create a window and print its borders and heading
+ * @param startx x-coordinate of window top left corner 
+ * @param starty y-coordinate of window top left corner
+ * @param rows window height
+ * @param cols window length
+ * @param title heading to be displayed at the top of window
+ * @param color color setting for title
+ * @return pointer to the window created
+ */
 WINDOW* create_window(int startx, int starty, int rows, int cols, char *title, chtype color) {
     WINDOW *win;
     win = newwin(rows, cols, starty, startx);
@@ -92,6 +128,10 @@ WINDOW* create_window(int startx, int starty, int rows, int cols, char *title, c
     return win;
 }
 
+/**
+ * @brief Function to delete a window
+ * @param local_win pointer to window to be deleted
+ */
 void destroy_win(WINDOW *local_win) {
     wclear(local_win);
     /* box(local_win, ' ', ' '); : This won't produce the desired
