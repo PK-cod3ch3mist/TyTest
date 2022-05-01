@@ -37,8 +37,7 @@ int main() {
 
         if (curr_choice == 0) {
             test_func();
-        }
-        else if (curr_choice == 1) {
+        } else if (curr_choice == 1) {
             about_func();
         }
     } while(curr_choice != 2);
@@ -84,8 +83,7 @@ void test_func() {
 
     if (wbwfile == NULL) {
         print_in_middle(wbw_win, 3, 0, WIN_SIZE_COLS, "FILE FAILED TO OPEN", COLOR_PAIR(3));
-    }
-    else {
+    } else {
         echo();
         char word[WIN_SIZE_COLS];
         char user_input[WIN_SIZE_COLS] = "\0";
@@ -149,7 +147,7 @@ int main_menu() {
     n_choices = ARRAY_SIZE(choices);
     my_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
     for(i = 0; i < n_choices; ++i)
-            my_items[i] = new_item(choices[i], desc);
+        my_items[i] = new_item(choices[i], desc);
 
     /* Create menu */
     my_menu = new_menu((ITEM **)my_items);
@@ -173,20 +171,19 @@ int main_menu() {
     post_menu(my_menu);
     wrefresh(my_menu_win);
 
-    while((c = wgetch(my_menu_win))) {       
-        switch(c)
-        {       
-            case KEY_DOWN:
-                curr_choice++;
-                menu_driver(my_menu, REQ_DOWN_ITEM);
-                break;
-            case KEY_UP:
-                curr_choice--;
-                menu_driver(my_menu, REQ_UP_ITEM);
-                break;
-            case 10:
-                menu_choice = 1;
-                break;
+    while((c = wgetch(my_menu_win))) {
+        switch(c) {
+        case KEY_DOWN:
+            curr_choice++;
+            menu_driver(my_menu, REQ_DOWN_ITEM);
+            break;
+        case KEY_UP:
+            curr_choice--;
+            menu_driver(my_menu, REQ_UP_ITEM);
+            break;
+        case 10:
+            menu_choice = 1;
+            break;
         }
         if (menu_choice) break;
         wrefresh(my_menu_win);

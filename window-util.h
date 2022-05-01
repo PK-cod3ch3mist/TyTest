@@ -100,7 +100,7 @@ void print_in_middle(WINDOW* win, int starty, int startx, int width, char* msg, 
  * @param title heading to be displayed at the top of window
  * @param color color setting for title
  */
-void renew_win(WINDOW* win, int rows, int cols, char *title, chtype color) { 
+void renew_win(WINDOW* win, int rows, int cols, char *title, chtype color) {
     box(win, ACS_VLINE, ACS_HLINE);
     wattron(win, A_BOLD);
     print_in_middle(win, 1, 0, cols, title, color);
@@ -113,7 +113,7 @@ void renew_win(WINDOW* win, int rows, int cols, char *title, chtype color) {
 
 /**
  * @brief Function to create a window and print its borders and heading
- * @param startx x-coordinate of window top left corner 
+ * @param startx x-coordinate of window top left corner
  * @param starty y-coordinate of window top left corner
  * @param rows window height
  * @param cols window length
